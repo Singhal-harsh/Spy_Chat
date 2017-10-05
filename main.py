@@ -1,5 +1,3 @@
-from xxsubtype import spamdict
-
 from spy_details import spy
 
 STATUS_MESSAGES = ["Busy","Available","Imperfection is beautiful","Spy work is the best!"]
@@ -103,6 +101,9 @@ def add_friend():
 
 def select_friend():
     print "Select friend in function"
+    if(len(friends)==0):
+        print "You have no friends!"
+        return 0
     for friend in friends:
         print "%s age: %d with rating of %.1f is online"%(friend["name"],friend["age"],friend["rating"])
     i = 1
