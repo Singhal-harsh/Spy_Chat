@@ -1,6 +1,7 @@
 from steganography.steganography import Steganography
 from datetime import datetime
 from spy_details import spy,friends,Spy,Chat_msg
+import csv
 
 STATUS_MESSAGES = ["Busy","Available","Imperfection is beautiful","Spy work is the best!"]
 
@@ -21,6 +22,15 @@ def check_age(age):
         return True
     else:
         return False
+
+def load_friends():
+    with open("friends.csv","rb") as friends_data:
+        reader = csv.reader(friends_data)
+
+        for row in reader:
+            spy_temp = Spy(row[0],row[1],int(row[2]),float(row[3]))
+            friends.append(spy_temp)
+
 
 def send_msg():
     friend_ch = select_friend()
@@ -62,6 +72,7 @@ def start_chat(spy) :
     menu_choices = "What do you want to do..\n1.Add Status message\n2.Add Friend\n3.Select Friend\n"
     menu_choices = menu_choices+"4.Send Message\n5.Read Message\n6.Exit Application\n"
 
+    load_friends()
     while(menu_show):
         choice = raw_input(menu_choices)
         if(choice=='1'):
@@ -124,6 +135,9 @@ def add_friend():
     new_friend.rating= input("Enter your spy friend's spy rating: ")
     if(check_age(new_friend.age)):
         friends.append(new_friend)
+        with open("friends.csv","wb") as friends_data:
+            writer = csv.writer(friends_data)
+            writer.writerow([new_friend.name,new_friend.sal,new_friend.age,new_friend.rating,new_friend.is0nline])
     else:
         print "Invalid name or not appropriate age!"
 
