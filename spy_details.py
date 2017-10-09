@@ -17,9 +17,9 @@ class Chat_msg:
 
 spy = Spy("Harsh", "Mr" , 18, 4.9)
 
-friend1 = Spy("Srk", "Mr" , 49 , 4.8)
-friend2 = Spy("Nanda", "Ms", 19, 4.7)
-friend3 = Spy("Rk", "Mr", 28 , 4.9)
+friend1 = Spy("Anushka", "Ms" , 25 , 4.8)
+friend2 = Spy("Priyanka", "Ms", 27, 4.7)
+friend3 = Spy("Deepika", "Ms", 28 , 4.9)
 
 friends = []
 friends.append(friend1)
