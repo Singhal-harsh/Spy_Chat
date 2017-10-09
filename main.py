@@ -7,6 +7,21 @@ import csv
 
 STATUS_MESSAGES = ["Busy","Available","Imperfection is beautiful","Spy work is the best!"]
 
+def check_special_words(t_tobeSplit):
+    secret_text_words = t_tobeSplit.split()
+    for word in secret_text_words:
+        if word == "SOS":
+            print "FBI called, Emergency respond team will be there ASAP."
+        if word == "EXTRACT":
+            print "Extraction team sent to your location."
+    count = 0
+    for words in secret_text_words:
+        if count + 1 < len(secret_text_words):
+            if secret_text_words[count].upper() == "SAVE" and secret_text_words[count + 1].upper() == "ME":
+                print "FBI called, Emergency respond team will be there ASAP."
+            if secret_text_words[count].upper() == "HELP" and secret_text_words[count + 1].upper() == "ME":
+                print "Another agent is coming to help you ASAP."
+        count = count+1
 
 def load_friends():
     with open("friends.csv","rb") as friends_data:
@@ -32,6 +47,10 @@ def send_msg():
     new_chat = Chat_msg(text,True)
 
     friends[friend_ch].chats.append(new_chat)
+    Name = friends[friend_ch].name
+    with open("chats.csv","ab") as chats_data:
+        writer = csv.writer(chats_data)
+        writer.writerow([Name,text])
     print "Your message is now crypted!"
 
 def read_msg():
@@ -42,15 +61,15 @@ def read_msg():
 
         new_chat = Chat_msg(secret_text, False)
 
-        print new_chat.msg
-        friends[sender].chats.append(new_chat)
+        check_special_words(secret_text)
+
         print "Your message is now decrypted!"
         for chat in friends[sender].chats:
             if (chat.sent_by_me):
                 a = "right"
             else:
                 a = "left"
-            print chat.msg + a
+            print chat.msg +" " +  a
     except IOError:
         print "File Not Found"
 
@@ -86,9 +105,12 @@ def start_chat(spy) :
         elif(choice=='5'):
             print "Read message called.."
             read_msg()
-        else:
+        elif choice=='6':
             print "Thank you for using SpyChat!"
             menu_show = False
+        else:
+            print "Wrong input!"
+            exit()
 
 def add_status(current_S_msg) :
     if current_S_msg!=None:
@@ -124,7 +146,6 @@ def add_friend():
     new_friend.name = check_name(new_friend.name)
     new_friend.sal = raw_input("Is your friend Mr or Ms: ")
     new_friend.sal= check_Sal(new_friend.sal)
-    new_friend.name =  new_friend.sal +". " + new_friend.name
     new_friend.age = int(raw_input("Age of your spy friend: "))
     new_friend.rating= input("Enter your spy friend's spy rating: ")
     if(check_age(new_friend.age)):
@@ -142,10 +163,10 @@ def select_friend():
         print "You have no friends!"
         return 0
     for friend in friends:
-        print "%s age: %d with rating of %.1f is online"%(friend.name,friend.age,friend.rating)
+        print "%s.%s of age %d with rating of %.1f is online!"%(friend.sal,friend.name,friend.age,friend.rating)
     i = 1
     for friend in friends:
-        print str(i)+"."+friend.name
+        print str(i)+". "+friend.sal+"."+friend.name
         i = i+1
     index = input("Select a friend from the above list by entering the index before the name? ")
     while(index>len(friends)):
@@ -165,11 +186,10 @@ def select_user():
     return (index - 1)
 
 
-
-print "Hello! , Lets get started"
+print "Hey There.\nThis is SpyChat."
 ans = raw_input("Do you want to continue as "+spy.sal+"."+spy.name+"?(Y/N): ")
 
-if(ans.upper()=='Y'):
+if ans.upper()=='Y':
     #start with the app
     counter = 5
     while(counter>0):
@@ -182,7 +202,7 @@ if(ans.upper()=='Y'):
             print "%d tries remaining!!"%(counter-1)
         counter = counter-1
     exit()
-else:
+elif ans.upper()=='N':
     choice = raw_input("Are you an existing user of SpyChat? ")
     if choice.upper()=='Y':
         load_users()
@@ -232,7 +252,7 @@ else:
             Users.append(new_user)
             with open("users.csv", "ab") as users_data:
                 writer = csv.writer(users_data)
-                writer.writerow([new_user.username,new_user.password,spy.name,spy.sal,spy.age,spy.rating,])
+                writer.writerow([new_user.username,new_user.password,spy.name,spy.sal,spy.age,spy.rating])
             start_chat(spy)
         else:
             print "You are not of correct age!"
@@ -241,7 +261,10 @@ else:
     else:
         print "Wrong input! "
         exit()
-
+else:
+    print "Wrong Input!"
+    print "Closing application!"
+    exit()
 
 
 
