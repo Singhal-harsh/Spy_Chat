@@ -2,13 +2,14 @@ from steganography.steganography import Steganography
 from datetime import datetime
 from spy_details import spy,friends,Spy,Chat_msg
 from users_details import Users,User
+
 from Validity import *
 import csv
 
 STATUS_MESSAGES = ["Busy","Available","Imperfection is beautiful","Spy work is the best!"]
 
-def check_special_words(t_tobeSplit):
-    secret_text_words = t_tobeSplit.split()
+def check_special_words(s_tobeSplit):
+    secret_text_words = s_tobeSplit.split()
     for word in secret_text_words:
         if word == "SOS":
             print "FBI called, Emergency respond team will be there ASAP."
@@ -37,6 +38,20 @@ def load_users():
             user_temp = User(row[0],row[1],row[2],row[3],int(row[4]),float(row[5]))
             Users.append(user_temp)
 
+def load_chat(ch):
+    name_friend = friends[ch].name
+    print "Chats with %s are: "%name_friend
+    with open("chats.csv","rb") as chats_data:
+        reader = csv.reader(chats_data)
+        check = False
+        for row in reader:
+            if(row[0]==name_friend):
+                check = True
+                print row[1]+"\nTime: "+row[2]
+
+        if check==False :
+            print "You have no chats with the selected friend!"
+
 def send_msg():
     friend_ch = select_friend()
     original_img = raw_input("What is the name of the image? ")
@@ -45,12 +60,13 @@ def send_msg():
     Steganography.encode(original_img,output_path,text)
 
     new_chat = Chat_msg(text,True)
-
+    time = new_chat.time
+    time = time.strftime("%b %d %Y %H:%M:%S")
     friends[friend_ch].chats.append(new_chat)
     Name = friends[friend_ch].name
     with open("chats.csv","ab") as chats_data:
         writer = csv.writer(chats_data)
-        writer.writerow([Name,text])
+        writer.writerow([Name,text,time])
     print "Your message is now crypted!"
 
 def read_msg():
@@ -73,19 +89,28 @@ def read_msg():
     except IOError:
         print "File Not Found"
 
+def display_friends() :
+    if (len(friends) == 0):
+        print "You have no friends!"
+        return 0
+    for friend in friends:
+        print "%s.%s of age %d with rating of %.1f is online!" % (friend.sal, friend.name, friend.age, friend.rating)
 
 def start_chat(spy) :
     spy.name = spy.sal + ". " + spy.name
     print "Authentication complete,Welcome " \
-          +spy.name + " age: " + str(spy.age) + " with rating: " + str(spy.rating)
+          +spy.name + " of age " + str(spy.age) + " with rating of " + str(spy.rating)
     print "Glad to have you with us!"
 
-    menu_show = True
+    load_friends()
+    display_friends()
+    print "First, Lets show you your chat history!\nSelect a friend whom you want to see your chats!"
+    ch = select_friend()
+    load_chat(ch)
 
+    menu_show = True
     menu_choices = "What do you want to do..\n1.Add Status message\n2.Add Friend\n3.Select Friend\n"
     menu_choices = menu_choices+"4.Send Message\n5.Read Message\n6.Exit Application\n"
-
-    load_friends()
     while(menu_show):
         choice = raw_input(menu_choices)
         if(choice=='1'):
@@ -159,16 +184,11 @@ def add_friend():
     return len(friends)
 
 def select_friend():
-    if(len(friends)==0):
-        print "You have no friends!"
-        return 0
-    for friend in friends:
-        print "%s.%s of age %d with rating of %.1f is online!"%(friend.sal,friend.name,friend.age,friend.rating)
     i = 1
     for friend in friends:
         print str(i)+". "+friend.sal+"."+friend.name
         i = i+1
-    index = input("Select a friend from the above list by entering the index before the name? ")
+    index = input("Select a friend from the above list by entering the number before the name? ")
     while(index>len(friends)):
         print "Invalid input"
         index = input("Enter correct index: ")
